@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-md-6">
+
+        <div class="card shadow">
+
+            <div class="card-header text-center bg-success text-white">
+                <h4>Depósito</h4>
+            </div>
+
+            <div class="card-body">
+
+                <p><strong>Saldo atual:</strong> R$ {{ conta.saldo }}</p>
+
+                <form method="post" id="formDeposito">
+
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label>Valor do depósito</label>
+
+                        <input
+                            type="number"
+                            step="0.01"
+                            name="valor"
+                            id="valorInput"
+                            class="form-control"
+                            required>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn btn-success w-100"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalConfirmacao">
+
+                        Depositar
+
+                    </button>
+
+                    {% include "components/modal_confirmacao.html" %}
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+document.querySelector('[data-bs-target="#modalConfirmacao"]').addEventListener('click', function () {
+
+    let valor = document.getElementById('valorInput').value;
+
+    if (!valor || valor <= 0) {
+        document.getElementById('valorConfirmacao').innerText = "Valor inválido";
+        return;
+    }
+
+    document.getElementById('valorConfirmacao').innerText =
+        "R$ " + parseFloat(valor).toFixed(2);
+});
+</script>
+
+{% endblock %}

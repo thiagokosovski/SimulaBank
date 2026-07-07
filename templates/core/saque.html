@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}
+Saque
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-lg-5">
+
+        <div class="card shadow">
+
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">Realizar Saque</h4>
+            </div>
+
+            <div class="card-body">
+
+                <p>
+                    <strong>Saldo disponível:</strong>
+                    R$ {{ conta.saldo }}
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        {{ form.valor.label_tag }}
+                        {{ form.valor }}
+                        {{ form.valor.errors }}
+                    </div>
+
+                    <!-- BOTÃO ABRE MODAL -->
+                    <button
+                        type="button"
+                        class="btn btn-danger w-100"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalConfirmacao">
+                        Sacar
+                    </button>
+
+                    <!-- MODAL DENTRO DO FORM -->
+                    <div class="modal fade" id="modalConfirmacao" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title">Confirmar Saque</h5>
+                                </div>
+
+                                <div class="modal-body">
+                                    Tem certeza que deseja realizar o saque?
+                                </div>
+
+                                <div class="modal-footer">
+
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        Cancelar
+                                    </button>
+
+                                    <!-- ISSO AQUI ENVIA O POST -->
+                                    <button type="submit" class="btn btn-danger">
+                                        Confirmar saque
+                                    </button>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

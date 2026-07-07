@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-md-6">
+
+        <div class="card shadow text-center">
+
+            <div class="card-header bg-success text-white">
+                <h4>Operação realizada com sucesso</h4>
+            </div>
+
+            <div class="card-body">
+
+                <p class="mb-4">
+                    Sua operação foi processada com sucesso.
+                </p>
+
+                <a href="{% url 'conta' %}" class="btn btn-primary">
+                    Voltar para conta
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

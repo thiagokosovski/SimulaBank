@@ -1,0 +1,101 @@
+{% extends "base_publica.html" %}
+
+{% block title %}
+Criar Conta
+{% endblock %}
+
+{% block content %}
+
+<!--
+====================================================
+    TELA DE CADASTRO DE CLIENTE
+====================================================
+
+Nesta aula (9.3) ainda não teremos o formulário.
+
+O objetivo é apenas criar a tela pública
+que será utilizada nas próximas aulas.
+
+Na Aula 9.4 este conteúdo será substituído
+pelo formulário completo de cadastro.
+
+====================================================
+-->
+
+<div class="row justify-content-center">
+
+    <div class="col-lg-8">
+
+        <div class="card shadow">
+
+            <!-- ==========================
+                 Cabeçalho
+            =========================== -->
+            <div class="card-header bg-success text-white">
+
+                <h3 class="mb-0 text-center">
+
+                    Criar Nova Conta
+
+                </h3>
+
+            </div>
+
+            <!-- ==========================
+                 Corpo do Card
+            =========================== -->
+            <div class="card-body">
+
+                <h5 class="text-primary">
+
+                    Bem-vindo ao SimulaPay!
+
+                </h5>
+
+               
+                <p>
+
+                    O SimulaPay é um sistema fictício, desenvolvido exclusivamente
+                    para fins de estudo e aprendizado.
+                    Nenhuma operação realizada neste sistema possui valor financeiro real.
+
+                </p>
+
+                
+                <hr>
+
+                <!-- Informação temporária -->
+
+                <div class="alert alert-info">
+
+                    <strong>Atenção:</strong>
+
+                    O formulário de cadastro será desenvolvido
+                    na próxima aula (Módulo 9.4).
+
+                </div>
+
+            </div>
+
+            <!-- ==========================
+                 Rodapé
+            =========================== -->
+
+            <div class="card-footer text-center">
+
+                <a href="{% url 'login' %}"
+                   class="btn btn-secondary">
+
+                    ← Voltar para o Login
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

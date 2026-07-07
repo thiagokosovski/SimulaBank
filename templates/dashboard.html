@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">
+    Bem-vindo,
+    <span class="text-primary">
+        {{ request.user.first_name|default:request.user.username }}
+    </span>
+</h2>
+
+<div class="row">
+
+    <!-- Saldo -->
+    <div class="col-md-4 mb-3">
+        <div class="card border-success shadow">
+            <div class="card-body">
+                <h6 class="text-muted">Saldo Atual</h6>
+                <h3 class="text-success">
+                    R$ {{ saldo|default:"0.00" }}
+                </h3>
+            </div>
+        </div>
+    </div>
+
+   
+    <!-- Último acesso -->
+    <div class="col-md-4 mb-3">
+        <div class="card border-warning shadow">
+            <div class="card-body">
+                <h6 class="text-muted">Último acesso</h6>
+                <h5>
+                    {{ ultimo_acesso|date:"d/m/Y H:i" }}
+                </h5>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<hr>
+
+<h4 class="mb-3">Operações rápidas</h4>
+
+<div class="row">
+
+    <div class="col-md-3 mb-3">
+        <a href="{% url 'deposito' %}" class="btn btn-success w-100">
+            💰 Depositar
+        </a>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <a href="{% url 'saque' %}" class="btn btn-danger w-100">
+            💸 Sacar
+        </a>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <a href="{% url 'pix' %}" class="btn btn-primary w-100">
+            ⚡ PIX
+        </a>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <a href="{% url 'extrato' %}" class="btn btn-dark w-100">
+            📄 Extrato
+        </a>
+    </div>
+
+</div>
+
+<hr>
+
+<h4 class="mb-3">Últimas movimentações</h4>
+
+<table class="table table-hover">
+
+    <thead class="table-dark">
+        <tr>
+            <th>Data</th>
+            <th>Descrição</th>
+            <th>Valor</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for mov in movimentacoes %}
+
+            <tr>
+                <td>{{ mov.data|date:"d/m/Y H:i" }}</td>
+
+                <td>{{ mov.descricao }}</td>
+
+                <td>
+                    {% if mov.tipo == "DEPOSITO" %}
+                        <span class="text-success">
+                            + R$ {{ mov.valor }}
+                        </span>
+                    {% else %}
+                        <span class="text-danger">
+                            - R$ {{ mov.valor }}
+                        </span>
+                    {% endif %}
+                </td>
+            </tr>
+
+        {% empty %}
+
+            <tr>
+                <td colspan="3" class="text-center text-muted">
+                    Nenhuma movimentação encontrada
+                </td>
+            </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

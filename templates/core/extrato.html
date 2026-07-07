@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-md-8">
+
+        <div class="card shadow">
+
+            <div class="card-header bg-dark text-white text-center">
+                <h4>Extrato Bancário</h4>
+            </div>
+
+            <div class="card-body">
+
+                <p><strong>Saldo atual:</strong> R$ {{ conta.saldo }}</p>
+
+                <hr>
+
+                {% if transacoes %}
+
+                    <table class="table table-hover">
+
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Tipo</th>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for t in transacoes %}
+
+                                <tr>
+                                    <td>{{ t.data|date:"d/m/Y H:i" }}</td>
+
+                                    <td>
+                                        <span class="badge
+                                            {% if t.tipo == 'PIX' %}bg-primary{% endif %}
+                                            {% if t.tipo == 'DEPOSITO' %}bg-success{% endif %}
+                                            {% if t.tipo == 'SAQUE' %}bg-danger{% endif %}">
+                                            {{ t.tipo }}
+                                        </span>
+                                    </td>
+
+                                    <td>{{ t.descricao }}</td>
+
+                                    <td>R$ {{ t.valor }}</td>
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                {% else %}
+
+                    <p class="text-center text-muted">
+                        Nenhuma transação encontrada.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

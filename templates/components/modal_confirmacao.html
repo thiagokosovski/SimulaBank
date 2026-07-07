@@ -1,0 +1,43 @@
+<div class="modal fade" id="modalConfirmacao" tabindex="-1">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Confirmar operação</h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <p>Deseja realmente confirmar esta operação?</p>
+
+                <p><strong>Valor:</strong> <span id="valorConfirmacao">R$ 0,00</span></p>
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+
+                <!-- ⚠️ IMPORTANTE: botão submit precisa estar dentro do form -->
+                <button type="submit"
+                        class="btn btn-success"
+                        form="formDeposito">
+                    Confirmar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

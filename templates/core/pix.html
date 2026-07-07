@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}
+PIX
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-lg-5">
+
+        <div class="card shadow">
+
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Transferência PIX</h4>
+            </div>
+
+            <div class="card-body">
+
+                <form method="post" id="formPix">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        {{ form.chave_destino.label_tag }}
+                        {{ form.chave_destino }}
+                        {{ form.chave_destino.errors }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.valor.label_tag }}
+                        {{ form.valor }}
+                        {{ form.valor.errors }}
+                    </div>
+
+                    <!-- BOTÃO ABRE MODAL -->
+                    <button
+                        type="button"
+                        class="btn btn-primary w-100"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalConfirmacao">
+                        Enviar PIX
+                    </button>
+
+                    <!-- MODAL -->
+                    <div class="modal fade" id="modalConfirmacao" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title">Confirmar PIX</h5>
+                                </div>
+
+                                <div class="modal-body">
+                                    <p id="valorConfirmacao">
+                                        Confirme a transação
+                                    </p>
+                                </div>
+
+                                <div class="modal-footer">
+
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        Cancelar
+                                    </button>
+
+                                    <button type="submit" class="btn btn-primary">
+                                        Confirmar PIX
+                                    </button>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const btn = document.querySelector('[data-bs-target="#modalConfirmacao"]');
+
+    btn.addEventListener('click', function () {
+
+        let valor = document.querySelector('input[name="valor"]').value;
+        let destino = document.querySelector('input[name="chave_destino"]').value;
+
+        if (!valor) valor = "0.00";
+        if (!destino) destino = "não informado";
+
+        document.getElementById('valorConfirmacao').innerText =
+            "R$ " + valor + " para " + destino;
+    });
+
+});
+</script>
+{% endblock %}

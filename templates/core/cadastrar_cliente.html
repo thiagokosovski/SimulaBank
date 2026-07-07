@@ -1,0 +1,41 @@
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <div class="card shadow border-0">
+
+            <div class="card-header bg-primary text-white text-center">
+                <h4 class="mb-0">Cadastro de Cliente</h4>
+            </div>
+
+            <div class="card-body p-4">
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        {{ form.cpf.label_tag }}
+                        {{ form.cpf }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.telefone.label_tag }}
+                        {{ form.telefone }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.data_nascimento.label_tag }}
+                        {{ form.data_nascimento }}
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 py-2">
+                        Salvar Cliente
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
