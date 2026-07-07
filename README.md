@@ -22,4 +22,5 @@ Sistema bancário didático desenvolvido em Django.
 
 ## Desenvolvedor
 
+
 Thiago Kosovski
