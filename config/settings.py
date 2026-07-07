@@ -31,6 +31,7 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
+    "simulabank.onrender.com",
 ]
 
 
