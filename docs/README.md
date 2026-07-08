@@ -13,6 +13,14 @@ Além do desenvolvimento da aplicação, este projeto também demonstra conhecim
 - Testes de Software
 - Automação de Testes (em desenvolvimento)
 
+
+# 🔗 Links úteis
+
+- 🌐 Aplicação: https://simulabank.onrender.com
+- ⚙️ Administração: https://simulabank.onrender.com/admin
+- 📂 Repositório GitHub: https://github.com/thiagokosovski/SimulaBank
+- 📖 Wiki: https://github.com/thiagokosovski/SimulaBank/wiki
+
 ---
 
 # 📑 Índice
