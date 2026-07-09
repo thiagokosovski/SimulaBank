@@ -1,0 +1,816 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+
+
+        <div class="card-header bg-primary text-white">
+
+            <h3 class="mb-0">
+                📁 Meus Documentos
+            </h3>
+
+        </div>
+
+
+        <div class="card-body">
+
+
+            {% include "customer_documents/components/menu_documentos.html" %}
+
+
+            <hr>
+
+
+            <!-- Lista de documentos -->
+
+
+            <div class="card shadow-sm">
+
+
+                <div class="card-header">
+
+                    <strong>
+                        Documentos enviados
+                    </strong>
+
+                </div>
+
+
+                <div class="card-body">
+
+
+                    <div class="table-responsive">
+
+
+                        <table class="table table-hover align-middle">
+
+
+                            <thead class="table-light">
+
+
+                                <tr>
+
+                                    <th>Tipo</th>
+
+                                    <th>Descrição</th>
+
+                                    <th>Arquivo</th>
+
+                                    <th>Data</th>
+
+                                    <th>Status</th>
+
+                                    <th>Ações</th>
+
+                                </tr>
+
+
+                            </thead>
+
+
+
+                        <tbody>
+
+
+                            {% for documento in documentos %}
+
+
+                            <tr>
+
+
+                            <td>
+                            {{ documento.tipo }}
+                            </td>
+
+
+                            <td>
+                            {{ documento.descricao }}
+                            </td>
+
+
+                            <td>
+                            {{ documento.arquivo.name }}
+                            </td>
+
+
+                            <td>
+                            {{ documento.data_envio|date:"d/m/Y" }}
+                            </td>
+
+
+                            <td>
+
+                            {% if documento.status == "APROVADO" %}
+
+                            <span class="badge bg-success">
+                            ✔ Aprovado
+                            </span>
+
+
+                            {% elif documento.status == "ANALISE" %}
+
+                            <span class="badge bg-warning text-dark">
+                            ⏳ Em análise
+                            </span>
+
+
+                            {% else %}
+
+                            <span class="badge bg-danger">
+                            ✖ Rejeitado
+                            </span>
+
+
+                            {% endif %}
+
+
+                            </td>
+
+
+                            <td>
+
+
+                            <button
+
+                            class="btn btn-outline-primary btn-sm"
+
+                            onclick="mostrarDocumento(
+
+                            '{{ documento.tipo }}',
+
+                            '{{ documento.descricao }}',
+
+                            '{{ documento.arquivo.url }}',
+
+                            '{{ documento.arquivo.name }}',
+
+                            '{{ documento.data_envio|date:"d/m/Y" }}',
+
+                            '{{ documento.status }}',
+
+                            '{{ documento.observacao }}'
+
+                            )">
+
+                            👁 Visualizar
+
+                            </button>
+
+
+
+                            <button
+
+                            class="btn btn-outline-danger btn-sm"
+
+                            data-bs-toggle="modal"
+
+                            data-bs-target="#modalExcluir{{ documento.id }}">
+
+                            🗑 Excluir
+
+                            </button>
+
+
+                            </td>
+
+
+                            </tr>
+
+
+                            {% empty %}
+
+
+                            <tr>
+
+                            <td colspan="6"
+
+                            class="text-center text-muted">
+
+                            Nenhum documento enviado.
+
+                            </td>
+
+                            </tr>
+
+
+                            {% endfor %}
+
+
+                            </tbody>
+
+
+                        </table>
+
+                    </div>    
+
+
+                        {% for documento in documentos %}
+
+                            <div class="modal fade"
+
+                            id="modalExcluir{{ documento.id }}"
+
+                            tabindex="-1">
+
+
+                            <div class="modal-dialog">
+
+
+                            <div class="modal-content">
+
+
+                            <div class="modal-header bg-danger text-white">
+
+                            <h5 class="modal-title">
+
+                            Confirmar exclusão
+
+                            </h5>
+
+
+                            <button
+
+                            type="button"
+
+                            class="btn-close"
+
+                            data-bs-dismiss="modal">
+
+                            </button>
+
+
+                            </div>
+
+
+
+                            <div class="modal-body">
+
+
+                            <p>
+                            Deseja realmente excluir:
+                            </p>
+
+
+                            <strong>
+
+                            {{ documento.tipo }}
+
+                            -
+
+                            {{ documento.descricao }}
+
+                            </strong>
+
+
+                            <p class="text-danger mt-3">
+
+                            ⚠ Esta ação não poderá ser desfeita.
+
+                            </p>
+
+
+                            </div>
+
+
+
+
+                            <div class="modal-footer">
+
+
+                            <button
+
+                                type="button"
+
+                                class="btn btn-secondary"
+
+                                data-bs-dismiss="modal">
+
+                                Cancelar
+
+                            </button>
+
+
+
+                            <form method="post"
+
+                            action="{% url 'customer_documents:excluir_documento' documento.id %}">
+
+
+                            {% csrf_token %}
+
+
+                            <button
+
+                                type="submit"
+
+                                class="btn btn-danger">
+
+                                🗑 Sim, excluir
+
+                            </button>
+
+
+                            </form>
+
+
+                            </div>
+
+
+                            </div>
+
+
+                            </div>
+
+
+                            </div>
+
+
+                            {% endfor %}
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+
+
+
+
+            <!-- Detalhes -->
+
+
+            <div class="card border-secondary mt-4">
+
+
+                <div class="card-header">
+
+
+                    <strong>
+
+                        📄 Detalhes do Documento
+
+                    </strong>
+
+
+                </div>
+
+
+
+
+                <div class="card-body">
+
+
+
+                    <div class="row">
+
+
+
+                        <!-- Informações -->
+
+
+                        <div class="col-md-8">
+
+
+                            <table class="table table-borderless">
+
+
+                                <tr>
+
+                                    <th width="180">
+
+                                        Tipo
+
+                                    </th>
+
+
+                                    <td id="det_tipo">
+
+                                        -
+
+                                    </td>
+
+
+                                </tr>
+
+
+
+                                <tr>
+
+                                    <th>
+
+                                        Descrição
+
+                                    </th>
+
+
+                                    <td id="det_descricao">
+
+                                        -
+
+                                    </td>
+
+
+                                </tr>
+
+
+
+                                <tr>
+
+                                    <th>
+
+                                        Arquivo
+
+                                    </th>
+
+
+                                    <td id="det_arquivo">
+
+                                        -
+
+                                    </td>
+
+
+                                </tr>
+
+
+
+                                <tr>
+
+                                    <th>
+
+                                        Data envio
+
+                                    </th>
+
+
+                                    <td id="det_data">
+
+                                        -
+
+                                    </td>
+
+
+                                </tr>
+
+
+
+                                <tr>
+
+                                    <th>
+
+                                        Status
+
+                                    </th>
+
+
+                                    <td id="det_status">
+
+                                        -
+
+                                    </td>
+
+
+                                </tr>
+
+
+
+                                <tr>
+
+                                    <th>
+
+                                        Observação
+
+                                    </th>
+
+
+                                    <td id="det_observacao">
+
+                                        -
+
+                                    </td>
+
+
+                                </tr>
+
+
+
+                            </table>
+
+
+                        </div>
+
+
+
+
+
+
+
+                        <!-- Preview -->
+
+
+                        <div class="col-md-4">
+
+
+                            <div class="card bg-light">
+
+
+                                <div class="card-header text-center">
+
+
+                                    🖼 Pré-visualização
+
+
+                                </div>
+
+
+
+                                <div class="card-body text-center">
+
+
+                                    <div id="preview_documento">
+
+
+                                        📄
+
+                                        <br><br>
+
+
+                                        Nenhum documento selecionado.
+
+
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+
+
+                    <hr>
+
+
+
+
+
+                    <button
+
+                        class="btn btn-success"
+
+                        id="btnDownload"
+
+                        disabled>
+
+
+                        📥 Download
+
+
+                    </button>
+
+
+
+
+                </div>
+
+
+            </div>
+
+
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<script>
+
+
+function mostrarDocumento(
+
+    tipo,
+
+    descricao,
+
+    arquivoUrl,
+
+    arquivoNome,
+
+    data,
+
+    status,
+
+    observacao
+
+){
+
+
+
+    document.getElementById("det_tipo").innerHTML = tipo;
+
+
+    document.getElementById("det_descricao").innerHTML = descricao;
+
+
+    document.getElementById("det_arquivo").innerHTML = arquivoNome;
+
+
+    document.getElementById("det_data").innerHTML = data;
+
+
+    document.getElementById("det_observacao").innerHTML = observacao;
+
+
+
+
+
+    if(status == "APROVADO"){
+
+
+        document.getElementById("det_status").innerHTML =
+
+        '<span class="badge bg-success">✔ Aprovado</span>';
+
+
+    }
+
+
+    else if(status == "ANALISE"){
+
+
+        document.getElementById("det_status").innerHTML =
+
+        '<span class="badge bg-warning text-dark">⏳ Em análise</span>';
+
+
+    }
+
+
+    else{
+
+
+        document.getElementById("det_status").innerHTML =
+
+        '<span class="badge bg-danger">✖ Rejeitado</span>';
+
+
+    }
+
+
+
+
+
+
+
+    let preview = document.getElementById(
+
+        "preview_documento"
+
+    );
+
+
+
+    let extensao = arquivoNome
+
+        .split(".")
+
+        .pop()
+
+        .toLowerCase();
+
+
+
+
+
+
+
+    if(
+
+
+        extensao == "jpg" ||
+
+        extensao == "jpeg" ||
+
+        extensao == "png"
+
+
+    ){
+
+
+        preview.innerHTML =
+
+
+        '<img src="' + arquivoUrl + '" ' +
+
+        'class="img-fluid rounded shadow" ' +
+
+        'style="max-height:300px;">';
+
+
+
+    }
+
+
+
+
+    else if(extensao == "pdf"){
+
+
+
+        preview.innerHTML =
+
+
+        '<iframe src="' + arquivoUrl + '" ' +
+
+        'width="100%" ' +
+
+        'height="300px"></iframe>';
+
+
+
+    }
+
+
+
+
+    else{
+
+
+        preview.innerHTML =
+
+
+        "📄 Arquivo sem pré-visualização";
+
+
+    }
+
+
+
+
+
+
+    let botao = document.getElementById(
+
+        "btnDownload"
+
+    );
+
+
+
+    botao.disabled = false;
+
+
+
+    botao.onclick = function(){
+
+
+        window.open(
+
+            arquivoUrl,
+
+            "_blank"
+
+        );
+
+
+    };
+
+
+}
+
+
+</script>
+
+
+
+{% endblock %}

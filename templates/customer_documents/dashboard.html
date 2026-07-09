@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-primary text-white">
+
+            <h3 class="mb-0">
+                📂 Documentos do Cliente
+            </h3>
+
+        </div>
+
+        <div class="card-body">
+
+            <p class="text-muted">
+                Área destinada ao envio e gerenciamento dos documentos do cliente.
+            </p>
+
+            {% include "customer_documents/components/menu_documentos.html" %}
+
+            <hr>
+
+            <!-- Resumo -->
+
+            <div class="row">
+
+                <div class="col-md-3 mb-3">
+
+                    <div class="card border-primary h-100">
+
+                        <div class="card-body text-center">
+
+                            <h1>📄</h1>
+
+                            <h5>Documentos</h5>
+
+                            <h2>{{ total_documentos }}</h2>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-3 mb-3">
+
+                    <div class="card border-success h-100">
+
+                        <div class="card-body text-center">
+
+                            <h1>📑</h1>
+
+                            <h5>Contratos</h5>
+
+                            <h2>{{ total_contratos }}</h2>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-3 mb-3">
+
+                    <div class="card border-warning h-100">
+
+                        <div class="card-body text-center">
+
+                            <h1>🟡</h1>
+
+                            <h5>Em análise</h5>
+
+                            <h2>{{ em_analise }}</h2>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-3 mb-3">
+
+                    <div class="card border-danger h-100">
+
+                        <div class="card-body text-center">
+
+                            <h1>❌</h1>
+
+                            <h5>Rejeitados</h5>
+
+                            <h2>{{ rejeitados }}</h2>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Últimos documentos -->
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+
+                    <div class="card shadow-sm h-100">
+
+                        <div class="card-header">
+
+                            📄 Últimos Documentos
+
+                        </div>
+
+                        <div class="card-body">
+
+                            {% if ultimos_documentos %}
+
+                            <table class="table table-hover">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>Tipo</th>
+
+                                        <th>Status</th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    {% for documento in ultimos_documentos %}
+
+                                    <tr>
+
+                                        <td>{{ documento.get_tipo_display }}</td>
+
+                                        <td>
+
+                                            {% if documento.status == "APROVADO" %}
+
+                                                🟢 Aprovado
+
+                                            {% elif documento.status == "ANALISE" %}
+
+                                                🟡 Em análise
+
+                                            {% else %}
+
+                                                🔴 Rejeitado
+
+                                            {% endif %}
+
+                                        </td>
+
+                                    </tr>
+
+                                    {% endfor %}
+
+                                </tbody>
+
+                            </table>
+
+                            {% else %}
+
+                            <div class="text-center p-4">
+
+                                <p class="text-muted">
+
+                                    Nenhum documento enviado.
+
+                                </p>
+
+                            </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Últimos contratos -->
+
+                <div class="col-md-6 mb-3">
+
+                    <div class="card shadow-sm h-100">
+
+                        <div class="card-header">
+
+                            📑 Últimos Contratos
+
+                        </div>
+
+                        <div class="card-body">
+
+                            {% if ultimos_contratos %}
+
+                            <table class="table table-hover">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>Descrição</th>
+
+                                        <th>Status</th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    {% for contrato in ultimos_contratos %}
+
+                                    <tr>
+
+                                        <td>{{ contrato.descricao }}</td>
+
+                                        <td>
+
+                                            {% if contrato.status == "APROVADO" %}
+
+                                                🟢 Aprovado
+
+                                            {% elif contrato.status == "ANALISE" %}
+
+                                                🟡 Em análise
+
+                                            {% else %}
+
+                                                🔴 Rejeitado
+
+                                            {% endif %}
+
+                                        </td>
+
+                                    </tr>
+
+                                    {% endfor %}
+
+                                </tbody>
+
+                            </table>
+
+                            {% else %}
+
+                            <div class="text-center p-4">
+
+                                <p class="text-muted">
+
+                                    Nenhum contrato enviado.
+
+                                </p>
+
+                            </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

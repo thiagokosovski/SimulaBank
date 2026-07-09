@@ -47,7 +47,7 @@ INSTALLED_APPS = [
 
     "core",
     "accounts",
-    'documents',
+    'customer_documents',
 ]
 
 MIDDLEWARE = [
@@ -145,3 +145,7 @@ LOGOUT_REDIRECT_URL = "/accounts/login/"
 LOGIN_URL = "/accounts/login/"
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+MEDIA_URL = "/media/"
+
+MEDIA_ROOT = BASE_DIR / "media"
