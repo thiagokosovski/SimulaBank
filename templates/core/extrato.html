@@ -16,6 +16,20 @@
 
                 <p><strong>Saldo atual:</strong> R$ {{ conta.saldo }}</p>
 
+                <div class="mb-3">
+
+                    <button
+                        class="btn btn-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalDownload">
+
+                        📥 Download do Extrato
+
+                    </button>
+
+                </div>
+
+
                 <hr>
 
                 {% if transacoes %}
@@ -73,5 +87,94 @@
     </div>
 
 </div>
+
+<!-- Modal Download -->
+
+<div class="modal fade"
+     id="modalDownload"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <form
+                id="formDownloadExtrato"
+                method="get"
+                action="{% url 'download_extrato' %}">
+
+                <div class="modal-header bg-primary text-white">
+
+                    <h5 class="modal-title">
+                        📥 Download do Extrato
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <label class="form-label">
+                        Formato
+                    </label>
+
+                    <select
+                        class="form-select"
+                        name="formato">
+
+                        <option value="pdf">PDF</option>
+                        <option value="xlsx">Excel (.xlsx)</option>
+                        <option value="csv">CSV</option>
+
+                    </select>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn btn-success">
+                        📥 Baixar
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+document.getElementById("formDownloadExtrato")
+.addEventListener("submit", function () {
+
+    const modal = bootstrap.Modal.getInstance(
+        document.getElementById("modalDownload")
+    );
+
+    modal.hide();
+
+});
+
+</script>
 
 {% endblock %}

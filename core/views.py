@@ -18,6 +18,25 @@ from .forms import EditarClienteForm
 
 from core.forms import EditarClienteForm, EditarUserForm
 
+import csv
+
+from django.http import HttpResponse
+
+
+import csv
+
+from io import BytesIO
+
+from openpyxl import Workbook
+
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Table,
+    TableStyle,
+)
+
 
 # ======================================
 # TELA PRINCIPAL DA CONTA
@@ -264,3 +283,155 @@ def meus_dados(request):
         'form_cliente': form_cliente,
         'cliente': cliente
     })
+
+@login_required
+def download_extrato(request):
+
+    formato = request.GET.get("formato")
+
+    conta = Conta.objects.get(
+        cliente__usuario=request.user
+    )
+
+    movimentacoes = conta.movimentacoes.order_by("-data")
+
+    if formato == "csv":
+
+        response = HttpResponse(
+            content_type="text/csv"
+        )
+
+        response["Content-Disposition"] = (
+            'attachment; filename="extrato.csv"'
+        )
+
+        writer = csv.writer(
+            response,
+            delimiter=";"
+        )
+
+        writer.writerow([
+            "Data",
+            "Tipo",
+            "Descrição",
+            "Valor",
+        ])
+
+        for mov in movimentacoes:
+
+            writer.writerow([
+                mov.data.strftime("%d/%m/%Y %H:%M"),
+                mov.tipo,
+                mov.descricao,
+                f"{mov.valor:.2f}",
+            ])
+
+        return response
+
+    if formato == "xlsx":
+
+        wb = Workbook()
+
+        ws = wb.active
+
+        ws.title = "Extrato"
+
+        ws.append([
+            "Data",
+            "Tipo",
+            "Descrição",
+            "Valor"
+        ])
+
+        for mov in movimentacoes:
+
+            ws.append([
+                mov.data.strftime("%d/%m/%Y %H:%M"),
+                mov.tipo,
+                mov.descricao,
+                float(mov.valor),
+            ])
+
+        response = HttpResponse(
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+        response["Content-Disposition"] = (
+            'attachment; filename="extrato.xlsx"'
+        )
+
+        wb.save(response)
+
+        return response
+
+    if formato == "pdf":
+
+        buffer = BytesIO()
+
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=A4
+        )
+
+        dados = []
+
+        dados.append([
+            "Data",
+            "Tipo",
+            "Descrição",
+            "Valor"
+        ])
+
+        for mov in movimentacoes:
+
+            dados.append([
+
+                mov.data.strftime("%d/%m/%Y %H:%M"),
+
+                mov.tipo,
+
+                mov.descricao,
+
+                f"R$ {mov.valor:.2f}"
+
+            ])
+
+        tabela = Table(dados)
+
+        tabela.setStyle(TableStyle([
+
+            ("BACKGROUND", (0, 0), (-1, 0), colors.darkblue),
+
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+
+            ("GRID", (0, 0), (-1, -1), 1, colors.grey),
+
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+
+            ("BOTTOMPADDING", (0, 0), (-1, 0), 10),
+
+            ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
+
+        ]))
+
+        doc.build([tabela])
+
+        pdf = buffer.getvalue()
+
+        buffer.close()
+
+        response = HttpResponse(
+            pdf,
+            content_type="application/pdf"
+        )
+
+        response["Content-Disposition"] = (
+            'attachment; filename="extrato.pdf"'
+        )
+
+        return response    
+        
+
+    
+
+    return redirect("extrato")

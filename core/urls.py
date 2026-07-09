@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 
+
+
 urlpatterns = [
 
     path("", views.conta, name="conta"),
@@ -21,5 +23,8 @@ urlpatterns = [
     path("cadastro/", views.cadastro_cliente, name="cadastro_cliente"),
 
     path('meus-dados/', views.meus_dados, name='meus_dados'),
+
+    path("extrato/download/", views.download_extrato,name="download_extrato",
+),
 
 ]
