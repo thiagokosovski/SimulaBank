@@ -45,6 +45,12 @@ urlpatterns = [
     views.extrato,
     name="api_extrato",
     ),
+
+    path(
+    "deposito/",
+    views.deposito,
+    name="api_deposito",
+    ),
   
 
 

@@ -100,4 +100,28 @@ class MovimentacaoSerializer(serializers.ModelSerializer):
 
             "data",
 
-        ]             
+        ]       
+
+from decimal import Decimal
+
+class DepositoSerializer(serializers.Serializer):
+
+    valor = serializers.DecimalField(
+        max_digits=12,
+        decimal_places=2
+    )
+
+    descricao = serializers.CharField(
+        max_length=200,
+        required=False,
+        allow_blank=True
+    )
+
+    def validate_valor(self, value):
+
+        if value <= Decimal("0.00"):
+            raise serializers.ValidationError(
+                "O valor do depósito deve ser maior que zero."
+            )
+
+        return value              

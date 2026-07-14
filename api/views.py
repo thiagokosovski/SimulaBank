@@ -3,6 +3,8 @@ from django.contrib.auth import authenticate
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from django.db import transaction
+from rest_framework import status
 
 from .serializers import (
     LoginSerializer,
@@ -10,6 +12,7 @@ from .serializers import (
     ClienteSerializer,
     ContaSerializer,
     MovimentacaoSerializer,
+    DepositoSerializer,
 )
 from core.models import Cliente, Conta, Movimentacao
 
@@ -158,4 +161,48 @@ def extrato(request):
         many=True
     )
 
-    return Response(serializer.data)    
+    return Response(serializer.data)  
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def deposito(request):
+    """
+    Realiza um depósito na conta do cliente autenticado.
+    """
+
+    serializer = DepositoSerializer(data=request.data)
+
+    if not serializer.is_valid():
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    cliente = Cliente.objects.get(usuario=request.user)
+
+    conta = Conta.objects.get(cliente=cliente)
+
+    valor = serializer.validated_data["valor"]
+    descricao = serializer.validated_data.get("descricao", "")
+
+    with transaction.atomic():
+
+        conta.saldo += valor
+        conta.save()
+
+        Movimentacao.objects.create(
+            conta=conta,
+            tipo="DEPOSITO",
+            valor=valor,
+            descricao=descricao
+        )
+
+    return Response(
+        {
+            "success": True,
+            "message": "Depósito realizado com sucesso.",
+            "saldo_atual": conta.saldo
+        },
+        status=status.HTTP_200_OK
+    )      
