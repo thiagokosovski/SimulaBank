@@ -1,6 +1,8 @@
 from decouple import config
 import dj_database_url
 
+from datetime import timedelta
+
 
 """
 Django settings for config project.
@@ -38,6 +40,9 @@ ALLOWED_HOSTS = config(
 # Application definition
 
 INSTALLED_APPS = [
+
+    # Apps do Django
+
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -45,9 +50,16 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
+    # Bibliotecas
+
+    "rest_framework",
+
+    # Apps do projeto
+
     "core",
     "accounts",
     'customer_documents',
+    "api",
 ]
 
 MIDDLEWARE = [
@@ -149,3 +161,27 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 
 MEDIA_ROOT = BASE_DIR / "media"
+
+
+REST_FRAMEWORK = {
+
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+
+    ],
+
+}
+
+
+SIMPLE_JWT = {
+
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+
+}
