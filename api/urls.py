@@ -51,6 +51,18 @@ urlpatterns = [
     views.deposito,
     name="api_deposito",
     ),
+
+    path(
+    "saque/",
+    views.saque,
+    name="api_saque",
+    ),
+
+    path(
+    "pix/",
+    views.pix,
+    name="api_pix",
+    ),
   
 
 

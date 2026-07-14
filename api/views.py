@@ -13,6 +13,8 @@ from .serializers import (
     ContaSerializer,
     MovimentacaoSerializer,
     DepositoSerializer,
+    SaqueSerializer,
+    PixSerializer,
 )
 from core.models import Cliente, Conta, Movimentacao
 
@@ -206,3 +208,178 @@ def deposito(request):
         },
         status=status.HTTP_200_OK
     )      
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def saque(request):
+    """
+    Realiza um saque na conta do cliente autenticado.
+    """
+
+    serializer = SaqueSerializer(data=request.data)
+
+    if not serializer.is_valid():
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    cliente = Cliente.objects.get(usuario=request.user)
+
+    conta = Conta.objects.get(cliente=cliente)
+
+    valor = serializer.validated_data["valor"]
+
+    descricao = serializer.validated_data.get(
+        "descricao",
+        ""
+    )
+
+    if conta.saldo < valor:
+
+        return Response(
+            {
+                "success": False,
+                "message": "Saldo insuficiente."
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    with transaction.atomic():
+
+        conta.saldo -= valor
+
+        conta.save()
+
+        Movimentacao.objects.create(
+
+            conta=conta,
+
+            tipo="SAQUE",
+
+            valor=valor,
+
+            descricao=descricao
+
+        )
+
+    return Response(
+
+        {
+
+            "success": True,
+
+            "message": "Saque realizado com sucesso.",
+
+            "saldo_atual": conta.saldo
+
+        },
+
+        status=status.HTTP_200_OK
+
+    )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def pix(request):
+    """
+    Realiza uma transferência PIX.
+    """
+
+    serializer = PixSerializer(data=request.data)
+
+    if not serializer.is_valid():
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    cliente_origem = Cliente.objects.get(usuario=request.user)
+
+    conta_origem = Conta.objects.get(cliente=cliente_origem)
+
+    cpf_destino = serializer.validated_data["cpf"]
+
+    valor = serializer.validated_data["valor"]
+
+    descricao = serializer.validated_data.get(
+        "descricao",
+        ""
+    )
+
+    try:
+
+        cliente_destino = Cliente.objects.get(
+            cpf=cpf_destino
+        )
+
+    except Cliente.DoesNotExist:
+
+        return Response(
+            {
+                "success": False,
+                "message": "Cliente destinatário não encontrado."
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    if cliente_destino == cliente_origem:
+
+        return Response(
+            {
+                "success": False,
+                "message": "Não é permitido realizar PIX para a própria conta."
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    conta_destino = Conta.objects.get(
+        cliente=cliente_destino
+    )
+
+    if conta_origem.saldo < valor:
+
+        return Response(
+            {
+                "success": False,
+                "message": "Saldo insuficiente."
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    with transaction.atomic():
+
+        conta_origem.saldo -= valor
+
+        conta_destino.saldo += valor
+
+        conta_origem.save()
+
+        conta_destino.save()
+
+        Movimentacao.objects.create(
+            conta=conta_origem,
+            tipo="PIX",
+            valor=valor,
+            descricao=f"PIX enviado para {cliente_destino.usuario.first_name}. {descricao}"
+        )
+
+        Movimentacao.objects.create(
+            conta=conta_destino,
+            tipo="PIX",
+            valor=valor,
+            descricao=f"PIX recebido de {cliente_origem.usuario.first_name}. {descricao}"
+        )
+
+    return Response(
+        {
+            "success": True,
+            "message": "PIX realizado com sucesso.",
+            "saldo_atual": conta_origem.saldo
+        },
+        status=status.HTTP_200_OK
+    )    
