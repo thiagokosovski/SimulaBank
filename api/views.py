@@ -5,6 +5,16 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.db import transaction
 from rest_framework import status
+from customer_documents.models import Documento
+from django.shortcuts import get_object_or_404
+import os
+
+
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiResponse,
+    OpenApiExample,
+)
 
 from .serializers import (
     LoginSerializer,
@@ -15,8 +25,13 @@ from .serializers import (
     DepositoSerializer,
     SaqueSerializer,
     PixSerializer,
+    DocumentoSerializer,
+    DocumentoCreateSerializer,
+    DocumentoStatusSerializer,
 )
 from core.models import Cliente, Conta, Movimentacao
+
+
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
@@ -164,6 +179,72 @@ def extrato(request):
     )
 
     return Response(serializer.data)  
+
+
+@extend_schema(
+
+    tags=["Operações"],
+
+    summary="Realizar depósito",
+
+    description="""
+Realiza um depósito na conta do cliente autenticado.
+
+Regras de negócio:
+
+• É obrigatório estar autenticado.
+
+• O valor deve ser maior que zero.
+
+• O saldo da conta será atualizado.
+
+• Será criada uma movimentação do tipo DEPÓSITO.
+
+""",
+
+    request=DepositoSerializer,
+
+    examples=[
+
+        OpenApiExample(
+
+            name="Depósito válido",
+
+            value={
+
+                "valor": "500.00",
+
+                "descricao": "Depósito em dinheiro"
+
+            },
+
+            request_only=True
+
+        )
+
+    ],
+
+    responses={
+
+        200: OpenApiResponse(
+            description="Depósito realizado com sucesso."
+        ),
+
+        400: OpenApiResponse(
+            description="Dados inválidos."
+        ),
+
+        401: OpenApiResponse(
+            description="Usuário não autenticado."
+        ),
+
+        500: OpenApiResponse(
+            description="Erro interno."
+        ),
+
+    }
+
+)
 
 
 @api_view(["POST"])
@@ -383,3 +464,162 @@ def pix(request):
         },
         status=status.HTTP_200_OK
     )    
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def documentos(request):
+    """
+    Lista ou cadastra documentos do usuário autenticado.
+    """
+
+    if request.method == "GET":
+
+        documentos = Documento.objects.filter(
+            usuario=request.user
+        ).order_by("-data_envio")
+
+        serializer = DocumentoSerializer(
+            documentos,
+            many=True
+        )
+
+        return Response(serializer.data)
+
+    serializer = DocumentoCreateSerializer(
+        data=request.data
+    )
+
+    if not serializer.is_valid():
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    documento = serializer.save(
+
+        usuario=request.user,
+
+        status="ANALISE"
+
+    )
+
+    return Response(
+
+        {
+
+            "success": True,
+
+            "message": "Documento enviado com sucesso.",
+
+            "id": documento.id,
+
+            "status": documento.status
+
+        },
+
+        status=status.HTTP_201_CREATED
+
+    )
+
+@api_view(["GET", "PUT", "PATCH", "DELETE"])
+@permission_classes([IsAuthenticated])
+def documento_detalhe(request, id):
+    """
+    Consulta, atualiza, altera parcialmente ou exclui
+    um documento do usuário autenticado.
+    """
+
+    documento = get_object_or_404(
+        Documento,
+        id=id,
+        usuario=request.user
+    )
+
+    # ==========================
+    # GET
+    # Consulta o documento
+    # ==========================
+    if request.method == "GET":
+
+        serializer = DocumentoSerializer(documento)
+
+        return Response(serializer.data)
+
+    # ==========================
+    # PUT
+    # Atualiza todos os dados
+    # ==========================
+    elif request.method == "PUT":
+
+        serializer = DocumentoCreateSerializer(
+            documento,
+            data=request.data
+        )
+
+        if not serializer.is_valid():
+
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer.save()
+
+        return Response(
+            {
+                "success": True,
+                "message": "Documento atualizado com sucesso.",
+                "documento": serializer.data
+            },
+            status=status.HTTP_200_OK
+        )
+
+    # ==========================
+    # PATCH
+    # Atualiza apenas o status
+    # ==========================
+    elif request.method == "PATCH":
+
+        serializer = DocumentoStatusSerializer(
+            documento,
+            data=request.data,
+            partial=True
+        )
+
+        if not serializer.is_valid():
+
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer.save()
+
+        return Response(
+            {
+                "success": True,
+                "message": "Status do documento atualizado com sucesso.",
+                "documento": serializer.data
+            },
+            status=status.HTTP_200_OK
+        )
+
+    # ==========================
+    # DELETE
+    # Exclui o documento
+    # ==========================
+    elif request.method == "DELETE":
+
+        if documento.arquivo:
+            documento.arquivo.delete(save=False)
+
+        documento.delete()
+
+        return Response(
+            {
+                "success": True,
+                "message": "Documento excluído com sucesso."
+            },
+            status=status.HTTP_200_OK
+        )

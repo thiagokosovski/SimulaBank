@@ -10,6 +10,12 @@ from rest_framework_simplejwt.views import (
 
 )
 
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularSwaggerView,
+    SpectacularRedocView,
+)
+
 urlpatterns = [
 
     path("health/", views.health, name="api_health"),
@@ -63,6 +69,47 @@ urlpatterns = [
     views.pix,
     name="api_pix",
     ),
+
+    path(
+    "documentos/",
+    views.documentos,
+    name="api_documentos",
+    ),
+
+    path(
+        "documentos/<int:id>/",
+        views.documento_detalhe,
+        name="api_documento_detalhe",
+    ),
+
+    # ===============================
+    # DOCUMENTAÇÃO OPENAPI
+    # ===============================
+
+    path(
+        "schema/",
+        SpectacularAPIView.as_view(),
+        name="schema",
+    ),
+
+    path(
+        "docs/",
+        SpectacularSwaggerView.as_view(
+            url_name="schema"
+        ),
+        name="swagger-ui",
+    ),
+
+    path(
+        "redoc/",
+        SpectacularRedocView.as_view(
+            url_name="schema"
+        ),
+        name="redoc",
+    ),
+
+
+  
   
 
 

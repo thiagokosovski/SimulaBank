@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "drf_spectacular",
 
     # Bibliotecas
 
@@ -165,15 +166,23 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 REST_FRAMEWORK = {
 
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
-    ],
+    # Gera automaticamente o schema OpenAPI
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 
-    "DEFAULT_AUTHENTICATION_CLASSES": [
+    # Autenticação padrão da API
+    "DEFAULT_AUTHENTICATION_CLASSES": (
 
         "rest_framework_simplejwt.authentication.JWTAuthentication",
 
-    ],
+    ),
+
+    # Todas as APIs exigem autenticação,
+    # exceto quando a View utilizar AllowAny.
+    "DEFAULT_PERMISSION_CLASSES": (
+
+        "rest_framework.permissions.IsAuthenticated",
+
+    ),
 
 }
 
@@ -183,5 +192,42 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
 
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+
+}
+
+SPECTACULAR_SETTINGS = {
+
+    "TITLE": "SimulaBank API",
+
+    "DESCRIPTION": """
+API REST do projeto SimulaBank.
+
+Projeto desenvolvido para fins didáticos,
+demonstrando autenticação JWT,
+operações bancárias,
+upload de documentos
+e automação de testes, criado por Thiago Kosovski.
+""",
+
+    "VERSION": "1.0.0",
+
+    "SERVE_INCLUDE_SCHEMA": False,
+
+
+    "COMPONENT_SPLIT_REQUEST": True,
+
+    "SECURITY": [
+        {
+            "BearerAuth": []
+        }
+    ],
+
+    "SECURITY_SCHEMES": {
+        "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT",
+        }
+    },
 
 }
